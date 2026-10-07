@@ -691,7 +691,30 @@ namespace Korona
                             }
                         }
 
-                       
+                        if (PriceResult.Count == 0 && StoreId == 11876)
+                        {
+                            var subs = dataitem.subproducts;
+                            if (subs != null && subs.Count > 0)
+                            {
+                                decimal subTotal = 0;
+                                bool anySubPrice = false;
+                                foreach (var sp in subs)
+                                {
+                                    if (sp.prices == null || sp.prices.Count == 0)
+                                        continue;
+                                    var matched = sp.prices.Where(p => p.priceGroup != null && p.priceGroup.id == StorePriceGroupId).ToList();
+                                    if (matched.Count == 0)
+                                        continue;
+                                    var latestSub = matched.OrderByDescending(p => p.validFrom).First();
+                                    subTotal += Convert.ToDecimal(latestSub.value) * Convert.ToDecimal(sp.quantity);
+                                    anySubPrice = true;
+                                }
+                                if (anySubPrice && subTotal > 0)
+                                {
+                                    PriceResult.Add(new QuantityPrice { id = StorePriceGroupId, value = subTotal, validFrom = DateTime.Now });
+                                }
+                            }
+                        }
                         if (PriceResult.Count > 0)
                         {
                             var MaxvalidFrom = PriceResult.Max(a => a.validFrom);
@@ -700,6 +723,13 @@ namespace Korona
 
                             finalResult.price = Price;
                             fullname.Price = Price;
+                            if (_config.Deposits > 0)
+                                finalResult.Deposit = _config.IsDepositByPack ? finalResult.pack * _config.Deposits : _config.Deposits;
+                            if (_config.IsRoundUp && Price > 0)
+                            {
+                                finalResult.price = Math.Ceiling(Price.Value);   // price only, not sprice
+                                fullname.Price = Math.Ceiling(Price.Value);
+                            }
                             finalResultList.Add(finalResult);
                             fullnameList.Add(fullname);
                         }

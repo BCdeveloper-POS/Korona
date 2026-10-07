@@ -911,6 +911,13 @@ namespace Korona
 
                                 finalResult.price = Price;
                                 fullname.Price = Price;
+                                if (_config.Deposits > 0)
+                                    finalResult.Deposit = _config.IsDepositByPack ? finalResult.pack * _config.Deposits : _config.Deposits;
+                                if (_config.IsRoundUp && Price > 0)
+                                {
+                                    finalResult.price = Math.Ceiling(Price.Value);   // price only, not sprice
+                                    fullname.Price = Math.Ceiling(Price.Value);
+                                }
                                 finalResultList.Add(finalResult);
                                 fullnameList.Add(fullname);
                             }
