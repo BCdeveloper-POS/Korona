@@ -691,7 +691,7 @@ namespace Korona
                             }
                         }
 
-                        if (PriceResult.Count == 0 && StoreId == 11876)
+                        if (PriceResult.Count == 0 && StoreId == 11876) //newly added for 11876 sub products
                         {
                             var subs = dataitem.subproducts;
                             if (subs != null && subs.Count > 0)
@@ -715,7 +715,7 @@ namespace Korona
                                 }
                             }
                         }
-                        if (PriceResult.Count > 0)
+                        if (PriceResult.Count > 0) 
                         {
                             var MaxvalidFrom = PriceResult.Max(a => a.validFrom);
                             var FinalPrice = PriceResult.Where(a => a.validFrom == MaxvalidFrom).ToList();
